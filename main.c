@@ -130,9 +130,16 @@ static void pollButtons(void){
      * PINC:  B7 B6 B5 B4 B3 B2 B1 B0
      */
 
+     DDRB = 0x00;
+     DDRC = 0x00;
      reportBuffer.rot = parseStick(PINB);
      reportBuffer.button_lower = PINC;
      reportBuffer.button_upper = ((0x30 && PINB) >> 4);
+     /*
+      * TODO:
+      *   PINC7 (Button 7) は存在せず、PINB4 (Button 8), PINB5 (Button 9) は SPI 書き込み用に予約、PINC6 はリセットに予約なので
+      *   PIND (現在 USB バスとして使用中) を代わりに使えないか検討。
+      */
 }
 
 usbMsgLen_t usbFunctionSetup(uchar data[8])
