@@ -136,7 +136,7 @@ static void pollButtons(void){
      PORTC = 0xff;
      reportBuffer.rot = parseStick(PINB);
      reportBuffer.button_lower = PINC;
-     reportBuffer.button_upper = ((0x30 && PINB) >> 4);
+     reportBuffer.button_upper = ((0x30 & PINB) >> 4);
      /*
       * TODO:
       *   PINC7 (Button 7) は存在せず、PINB4 (Button 8), PINB5 (Button 9) は SPI 書き込み用に予約、PINC6 はリセットに予約なので
