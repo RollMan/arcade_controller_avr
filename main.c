@@ -63,7 +63,7 @@ PROGMEM const char usbDescriptorHidReport[56] = {
 /*
  * |   7|    6|    5|    4|    3|    2|    1|    0|
  * |----|-----|-----|-----|-----|-----|-----|-----|
- * |   x|    x|    x|    x|  ps3|  ps2|  ps1|  ps0|
+ * |   x|    x|    x|    x|    S|    N|    W|    E|
  * |  b7|   b6|   b5|   b4|   b3|   b2|   b1|   b0|
  * |    |   xx|   xx|   xx|   xx|   xx|   b9|   b8|
  */
@@ -133,13 +133,6 @@ static void pollButtons(void){
      * | PIND | B7 | B6  |  x | D- |  x | D+ |  x |  x |
      */
 
-     DDRD = (DDRD & 0x3f);
-     PORTD = (PORTD | 0xC0);
-
-     DDRB = 0x00;
-     DDRC = 0x00;
-     PORTB = 0xff;
-     PORTC = 0xff;
 
      reportBuffer.rot = parseStick(PINB);
      reportBuffer.button_lower = (0xC0 & PIND)  | (0x3f & PINC);
@@ -205,6 +198,13 @@ uchar   i;
 
     DDRB = 0x00;
     DDRC = 0x00;
+    DDRD = (DDRD & 0x3f);
+    PORTD = (PORTD | 0xC0);
+
+    DDRB = 0x00;
+    DDRC = 0x00;
+    PORTB = 0xff;
+    PORTC = 0xff;
     for(;;){                /* main event loop */
         DBG1(0x02, 0, 0);   /* debug output: main loop iterates */
         wdt_reset();
