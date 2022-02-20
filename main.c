@@ -126,16 +126,23 @@ static char parseStick(uint8_t port){
 
 static void pollButtons(void){
     /*
-     * PINB:   .  . B9 B8 -Y +Y -X +X
-     * PINC:  B7 B6 B5 B4 B3 B2 B1 B0
+     * |      | 7  | 6   | 5  | 4  | 3  | 2  | 1  | 0  |
+     * |------|----|-----|----|----|----|----|----|----|
+     * | PINB | .  | .   | B9 | B8 | -Y | +Y | -X | +X |
+     * | PINC | x  | RST | B5 | B4 | B3 | B2 | B1 | B0 |
+     * | PIND | B7 | B6  |  x | D- |  x | D+ |  x |  x |
      */
+
+     DDRD = (DDRD & 0x3f);
+     PORTD = (PORTD | 0xC0);
 
      DDRB = 0x00;
      DDRC = 0x00;
      PORTB = 0xff;
      PORTC = 0xff;
+
      reportBuffer.rot = parseStick(PINB);
-     reportBuffer.button_lower = PINC;
+     reportBuffer.button_lower = (0xC0 & PIND)  | (0x3f & PINC);
      reportBuffer.button_upper = ((0x30 & PINB) >> 4);
      /*
       * TODO:
