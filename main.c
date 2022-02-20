@@ -30,20 +30,19 @@ publish any hardware using these IDs! This is for demonstration only!
 /* ----------------------------- USB interface ----------------------------- */
 /* ------------------------------------------------------------------------- */
 
-PROGMEM const char usbDescriptorHidReport[56] = {
+PROGMEM const char usbDescriptorHidReport[53] = {
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
     0x09, 0x05,                    // USAGE (Game Pad)
     0xa1, 0x01,                    // COLLECTION (Application)
-    0x05, 0x01,                    //   USAGE_PAGE (Generic Desktop)
-    0x09, 0x39,                    //   USAGE (Hat switch)
+    0x09, 0x90,              // 0x42(0x90)
+    0x09, 0x91,              // 0x42(0x91)
+    0x09, 0x92,              // 0x42(0x92)
+    0x09, 0x93,              // 0x42(0x93)
     0x15, 0x00,                    //   LOGICAL_MINIMUM (0)
-    0x25, 0x07,                    //   LOGICAL_MAXIMUM (7)
-    0x35, 0x00,                    //   PHYSICAL_MINIMUM (0)
-    0x46, 0x3b, 0x01,              //   PHYSICAL_MAXIMUM (315)
-    0x65, 0x14,                    //   UNIT (Eng Rot:Angular Pos)
+    0x25, 0x01,                    //   LOGICAL_MAXIMUM (1)
     0x75, 0x04,                    //   REPORT_SIZE (4)
     0x95, 0x01,                    //   REPORT_COUNT (1)
-    0x81, 0x42,                    //   INPUT (Data,Var,Abs,Null)
+    0x81, 0x02,                    //   INPUT (Data,Var,Abs)
     0x65, 0x00,                    //   UNIT (None)
     0x75, 0x01,                    //   REPORT_SIZE (1)
     0x95, 0x04,                    //   REPORT_COUNT (4)
@@ -60,37 +59,28 @@ PROGMEM const char usbDescriptorHidReport[56] = {
     0x81, 0x03,                    //   INPUT (Cnst,Var,Abs)
     0xc0                           // END_COLLECTION
 };
+
 /*
  * |   7|    6|    5|    4|    3|    2|    1|    0|
  * |----|-----|-----|-----|-----|-----|-----|-----|
- * |   x|    x|    x|    x|  ps3|  ps2|  ps1|  ps0|
+ * |   x|    x|    x|    x|  DLF|  DRI|  DWN|  DUP|
  * |  b7|   b6|   b5|   b4|   b3|   b2|   b1|   b0|
  * |    |   xx|   xx|   xx|   xx|   xx|   b9|   b8|
  */
 
 typedef struct{
-    uint8_t rot;
+    uint8_t yx;
     uint8_t button_lower;
     uint8_t button_upper;
 }report_t;
 
-typedef enum DESCRIPTOR_PADSWITCH {
-  DPAD_N        = 0x00,
-  DPAD_NE       = 0x01,
-  DPAD_E        = 0x02,
-  DPAD_SE       = 0x03,
-  DPAD_S        = 0x04,
-  DPAD_SW       = 0x05,
-  DPAD_W        = 0x06,
-  DPAD_NW       = 0x07,
-  DPAD_RELEASED = 0x08,
-} PADSWITCH_BITS;
 
 static report_t reportBuffer;
 static uchar    idleRate;   /* repeat rate for keyboards, never used for mice */
 
 static char parseStick(uint8_t port){
   uint8_t res = 0;
+  res = (port & 0x0f);
   return res;
 }
 
@@ -100,7 +90,7 @@ static void pollButtons(void){
      * PINC:  B7 B6 B5 B4 B3 B2 B1 B0
      */
 
-     reportBuffer.rot = parseStick(PINB);
+     reportBuffer.yx = parseStick(PINB);
      reportBuffer.button_lower = PINC;
      reportBuffer.button_upper = ((0x30 && PINB) >> 4);
 }

@@ -1,20 +1,19 @@
 // F:\Documents\vusb-20121206\examples\hid-mouse\firmware\arcade_controller.h
 
 
-char ReportDescriptor[56] = {
+char ReportDescriptor[57] = {
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
     0x09, 0x05,                    // USAGE (Game Pad)
     0xa1, 0x01,                    // COLLECTION (Application)
-    0x05, 0x01,                    //   USAGE_PAGE (Generic Desktop)
-    0x09, 0x39,                    //   USAGE (Hat switch)
+    0x42, 0x90, 0x00,              // 0x42(0x90)
+    0x42, 0x91, 0x00,              // 0x42(0x91)
+    0x42, 0x92, 0x00,              // 0x42(0x92)
+    0x42, 0x93, 0x00,              // 0x42(0x93)
     0x15, 0x00,                    //   LOGICAL_MINIMUM (0)
-    0x25, 0x07,                    //   LOGICAL_MAXIMUM (7)
-    0x35, 0x00,                    //   PHYSICAL_MINIMUM (0)
-    0x46, 0x3b, 0x01,              //   PHYSICAL_MAXIMUM (315)
-    0x65, 0x14,                    //   UNIT (Eng Rot:Angular Pos)
+    0x25, 0x01,                    //   LOGICAL_MAXIMUM (1)
     0x75, 0x04,                    //   REPORT_SIZE (4)
     0x95, 0x01,                    //   REPORT_COUNT (1)
-    0x81, 0x42,                    //   INPUT (Data,Var,Abs,Null)
+    0x81, 0x02,                    //   INPUT (Data,Var,Abs)
     0x65, 0x00,                    //   UNIT (None)
     0x75, 0x01,                    //   REPORT_SIZE (1)
     0x95, 0x04,                    //   REPORT_COUNT (4)
