@@ -91,6 +91,36 @@ static uchar    idleRate;   /* repeat rate for keyboards, never used for mice */
 
 static char parseStick(uint8_t port){
   uint8_t res = 0;
+  uint8_t X_UP = (res & (1 << 0));
+  uint8_t X_DOWN = (res & (1 << 1));
+  uint8_t Y_UP = (res & (1 << 2));
+  uint8_t Y_DOWN = (res & (1 << 3));
+
+  if (X_UP){
+    if (Y_UP){
+      res = DPAD_NE;
+    }else if (Y_DOWN){
+      res = DPAD_SE;
+    }else{
+      res = DPAD_E;
+    }
+  }else if (X_DOWN){
+    if (Y_UP){
+      res = DPAD_NW;
+    }else if (Y_DOWN){
+      res = DPAD_SW;
+    }else{
+      res = DPAD_W;
+    }
+  }else if (Y_UP){
+    res = DPAD_N;
+  }else if (Y_DOWN){
+    res = DPAD_S;
+  }else{
+    res = DPAD_RELEASED;
+  }
+
+
   return res;
 }
 
