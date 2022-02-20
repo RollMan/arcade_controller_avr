@@ -132,6 +132,8 @@ static void pollButtons(void){
 
      DDRB = 0x00;
      DDRC = 0x00;
+     PORTB = 0xff;
+     PORTC = 0xff;
      reportBuffer.rot = parseStick(PINB);
      reportBuffer.button_lower = PINC;
      reportBuffer.button_upper = ((0x30 && PINB) >> 4);
