@@ -30,22 +30,23 @@ publish any hardware using these IDs! This is for demonstration only!
 /* ----------------------------- USB interface ----------------------------- */
 /* ------------------------------------------------------------------------- */
 
-PROGMEM const char usbDescriptorHidReport[52] = {
+PROGMEM const char usbDescriptorHidReport[54] = 
+{
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
     0x09, 0x05,                    // USAGE (Game Pad)
     0xa1, 0x01,                    // COLLECTION (Application)
-    0x09, 0x01,                    //   USAGE (Pointer)
-    0xa1, 0x00,                    //   COLLECTION (Physical)
-    0x09, 0x30,                    //     USAGE (X)
-    0x09, 0x31,                    //     USAGE (Y)
-    0x15, 0xff,                    //     LOGICAL_MINIMUM (-1)
-    0x25, 0x01,                    //     LOGICAL_MAXIMUM (1)
-    0x95, 0x02,                    //     REPORT_COUNT (2)
-    0x75, 0x02,                    //     REPORT_SIZE (2)
-    0x81, 0x02,                    //     INPUT (Data,Var,Abs)
-    0xc0,                          //   END_COLLECTION
-    0x95, 0x04,                    //   REPORT_COUNT (4)
+    0x09, 0x39,                    //   USAGE (Hat switch)
+    0x15, 0x00,                    //   LOGICAL_MINIMUM (0)
+    0x25, 0x07,                    //   LOGICAL_MAXIMUM (7)
+    0x35, 0x00,                    //   PHYSICAL_MINIMUM (0)
+    0x46, 0x3b, 0x01,              //   PHYSICAL_MAXIMUM (315)
+    0x65, 0x14,                    //   UNIT (Eng Rot:Angular Pos)
+    0x75, 0x03,                    //   REPORT_SIZE (3)
+    0x95, 0x01,                    //   REPORT_COUNT (1)
+    0x81, 0x02,                    //   INPUT (Data,Var,Abs)
+    0x65, 0x00,                    //   UNIT (None)
     0x75, 0x01,                    //   REPORT_SIZE (1)
+    0x95, 0x01,                    //   REPORT_COUNT (1)
     0x81, 0x03,                    //   INPUT (Cnst,Var,Abs)
     0x05, 0x09,                    //   USAGE_PAGE (Button)
     0x19, 0x01,                    //   USAGE_MINIMUM (Button 1)
@@ -59,12 +60,31 @@ PROGMEM const char usbDescriptorHidReport[52] = {
     0x81, 0x03,                    //   INPUT (Cnst,Var,Abs)
     0xc0                           // END_COLLECTION
 };
+/*
+ * |   7|    6|    5|    4|    3|    2|    1|    0|
+ * |----|-----|-----|-----|-----|-----|-----|-----|
+ * |   x|    x|    x|    x|  ps3|  ps2|  ps1|  ps0|
+ * |  b7|   b6|   b5|   b4|   b3|   b2|   b1|   b0|
+ * |    |   xx|   xx|   xx|   xx|   xx|   b9|   b8|
+ */
 
 typedef struct{
-    uint8_t yx;
+    uint8_t rot;
     uint8_t button_lower;
     uint8_t button_upper;
 }report_t;
+
+typedef enum DESCRIPTOR_PADSWITCH {
+  DPAD_N        = 0x00,
+  DPAD_NE       = 0x01,
+  DPAD_E        = 0x02,
+  DPAD_SE       = 0x03,
+  DPAD_S        = 0x04,
+  DPAD_SW       = 0x05,
+  DPAD_W        = 0x06,
+  DPAD_NW       = 0x07,
+  DPAD_RELEASED = 0x08,
+} PADSWITCH_BITS;
 
 static report_t reportBuffer;
 static uchar    idleRate;   /* repeat rate for keyboards, never used for mice */
@@ -73,16 +93,36 @@ static char parseStick(uint8_t port){
   uint8_t res = 0;
   if (port & (1 << 0)) {
     // +X
-    res |= 0x01;
+    if (port & (1 << 2)){
+      // +X +Y
+      res = DPAD_NE;
+    }else if (port & (1 << 3)){
+      // +X -Y
+      res = DPAD_SE;
+    }else{
+      res = DPAD_E;
+    }
   }else if (port & (1 << 1)) {
     // -X
-    res |= 0x03;
-  }
-  if (port & (1 << 2)){
+    if (port & (1 << 2)){
+      // -X +Y
+      res = DPAD_NW;
+    }else if (port & (1 << 3)){
+      // -X -Y
+      res = DPAD_SW;
+    }
+    else{
+      // -X
+      res = DPAD_W;
+    }
+  }else if (port & (1 << 2)){
     // +Y
-    res |= (0x01 << 2);
+    res = DPAD_N;
   }else if (port & (1 << 3)){
-    res |= (0x03 << 2);
+    // -Y
+    res = DPAD_S;
+  }else{
+    res = DPAD_RELEASED;
   }
   return res;
 }
@@ -93,10 +133,7 @@ static void pollButtons(void){
      * PINC:  B7 B6 B5 B4 B3 B2 B1 B0
      */
 
-     reportBuffer.yx = parseStick(PINB);
-     /*
-      * TODO: match PINC and HID descriptor bit assignment
-      */
+     reportBuffer.rot = parseStick(PINB);
      reportBuffer.button_lower = PINC;
      reportBuffer.button_upper = ((0x30 && PINB) >> 4);
 }
