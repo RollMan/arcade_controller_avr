@@ -91,10 +91,10 @@ static uchar    idleRate;   /* repeat rate for keyboards, never used for mice */
 
 static char parseStick(uint8_t port){
   uint8_t res = 0;
-  uint8_t X_UP = (res & (1 << 0));
-  uint8_t X_DOWN = (res & (1 << 1));
-  uint8_t Y_UP = (res & (1 << 2));
-  uint8_t Y_DOWN = (res & (1 << 3));
+  uint8_t X_UP = (port & (1 << 0));
+  uint8_t X_DOWN = (port & (1 << 1));
+  uint8_t Y_UP = (port & (1 << 2));
+  uint8_t Y_DOWN = (port & (1 << 3));
 
   if (X_UP){
     if (Y_UP){
