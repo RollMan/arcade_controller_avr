@@ -91,10 +91,10 @@ static uchar    idleRate;   /* repeat rate for keyboards, never used for mice */
 
 static char parseStick(uint8_t port){
   uint8_t res = 0;
-  uint8_t X_UP = (port & (1 << 0));
-  uint8_t X_DOWN = (port & (1 << 1));
-  uint8_t Y_UP = (port & (1 << 2));
-  uint8_t Y_DOWN = (port & (1 << 3));
+  uint8_t X_UP = !(port & (1 << 0));
+  uint8_t X_DOWN = !(port & (1 << 1));
+  uint8_t Y_UP = !(port & (1 << 2));
+  uint8_t Y_DOWN = !(port & (1 << 3));
 
   if (X_UP){
     if (Y_UP){
@@ -135,8 +135,8 @@ static void pollButtons(void){
 
 
      reportBuffer.rot = parseStick(PINB);
-     reportBuffer.button_lower = (0xC0 & PIND)  | (0x3f & PINC);
-     reportBuffer.button_upper = ((0x30 & PINB) >> 4);
+     reportBuffer.button_lower = ~((0xC0 & PIND)  | (0x3f & PINC));
+     reportBuffer.button_upper = ~(((0x30 & PINB) >> 4));
      /*
       * TODO:
       *   PINC7 (Button 7) は存在せず、PINB4 (Button 8), PINB5 (Button 9) は SPI 書き込み用に予約、PINC6 はリセットに予約なので
