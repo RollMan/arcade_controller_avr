@@ -63,7 +63,7 @@ PROGMEM const char usbDescriptorHidReport[56] = {
 /*
  * |   7|    6|    5|    4|    3|    2|    1|    0|
  * |----|-----|-----|-----|-----|-----|-----|-----|
- * |   x|    x|    x|    x|    S|    N|    W|    E|
+ * |   x|    x|    x|    x|    S|    N|    E|    W|
  * |  b7|   b6|   b5|   b4|   b3|   b2|   b1|   b0|
  * |    |   xx|   xx|   xx|   xx|   xx|   b9|   b8|
  */
@@ -91,8 +91,8 @@ static uchar    idleRate;   /* repeat rate for keyboards, never used for mice */
 
 static char parseStick(uint8_t port){
   uint8_t res = 0;
-  uint8_t X_UP = !(port & (1 << 0));
-  uint8_t X_DOWN = !(port & (1 << 1));
+  uint8_t X_DOWN = !(port & (1 << 0));
+  uint8_t X_UP = !(port & (1 << 1));
   uint8_t Y_UP = !(port & (1 << 2));
   uint8_t Y_DOWN = !(port & (1 << 3));
 
