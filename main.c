@@ -30,10 +30,11 @@ publish any hardware using these IDs! This is for demonstration only!
 /* ----------------------------- USB interface ----------------------------- */
 /* ------------------------------------------------------------------------- */
 
-PROGMEM const char usbDescriptorHidReport[56] = {
+PROGMEM const char usbDescriptorHidReport[59] = {
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
     0x09, 0x05,                    // USAGE (Game Pad)
     0xa1, 0x01,                    // COLLECTION (Application)
+    0xa1, 0x00,                    //   COLLECTION (Physical)
     0x05, 0x01,                    //   USAGE_PAGE (Generic Desktop)
     0x09, 0x39,                    //   USAGE (Hat switch)
     0x15, 0x00,                    //   LOGICAL_MINIMUM (0)
@@ -58,7 +59,8 @@ PROGMEM const char usbDescriptorHidReport[56] = {
     0x81, 0x02,                    //   INPUT (Data,Var,Abs)
     0x95, 0x06,                    //   REPORT_COUNT (6)
     0x81, 0x03,                    //   INPUT (Cnst,Var,Abs)
-    0xc0                           // END_COLLECTION
+    0xc0,                           // END_COLLECTION
+    0xc0,                          // END_COLLECTION
 };
 /*
  * |   7|    6|    5|    4|    3|    2|    1|    0|
